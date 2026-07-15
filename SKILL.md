@@ -1,7 +1,7 @@
 ---
 name: gbro-collage-broll
 description: 将约 5 秒口播文稿、观点句或抽象概念做成高级 editorial halftone paper-collage / 半调纸拼贴 B-roll。用户说“collage b-roll”“纸拼贴 b-roll”“半调拼贴”“拼贴风格配画面”“用这段文稿做拼贴动画”“gbro-collage-broll”，或希望把一句文稿转成拼贴视觉隐喻时，必须使用此 skill。强制采用三阶段审批：先只提视觉隐喻，用户确认后才生成彩色拼贴静帧，静帧再次确认后才默认调用 Gemini Omni Flash 生成首尾帧组装动画。默认视频模型固定为 gemini-omni-flash-preview，不再默认使用 Veo；只有用户明确指定其他模型时才切换。
-compatibility: 在 Codex 环境运行（Gate 2 依赖内置 image_gen）。视频生成脚本已随本 skill 自带（scripts/generate_video.py），另需 Python >= 3.10、google-genai >= 2.10.0、已配置的 GEMINI_API_KEY，以及 ffmpeg / ffprobe。首次使用先按「首次使用：环境自检」完成配置。
+compatibility: 支持 Codex 和 Claude Code。Gate 2 使用 Codex 内置 image_gen，或 Claude Code 中已安装的图片生成 skill（默认查找 image-gen）。视频生成另需 Python >= 3.10、google-genai >= 2.10.0、GEMINI_API_KEY，以及 ffmpeg / ffprobe。
 ---
 
 # gbro Collage B-roll
@@ -51,8 +51,10 @@ bash <本skill目录>/scripts/check_setup.sh
    ~/hyperframes-projects/.omni-venv/bin/python -m pip install --upgrade "google-genai>=2.10.0" "httpx[socks]"
    ```
 
-5. **不在 Codex 环境 / 没有内置 image_gen**
-   Gate 2 的静帧生成依赖 Codex 内置 `image_gen` 工具。在其他 agent 环境下运行时，向用户说明需要自行提供等效的图片生成方式（或手动提供静帧图片后从 Gate 2 确认继续）。
+5. **没有可用的图片生成能力**
+   Gate 2 需要以下任一能力：Codex 内置 `image_gen`；Claude Code 中已安装的
+   `image-gen` skill；或用户明确指定的等效图片生成 skill。都不可用时，再请用户
+   安装图片生成 skill 或手动提供静帧图片。
 
 ## 强制审批协议
 
@@ -75,7 +77,15 @@ bash <本skill目录>/scripts/check_setup.sh
 
 ### Gate 2：静帧确认
 
-隐喻确认后，才写 visual spec 和 imagegen prompt，并用 Codex `imagegen` 生成最终静帧。
+隐喻确认后，才写 visual spec 和 imagegen prompt，并按当前 agent 选择图片生成方式：
+
+1. Codex：使用内置 `image_gen`（或本地 `imagegen` skill 规定的方式）。
+2. Claude Code：用 Skill 工具调用已安装的 `image-gen`；读取并严格遵守它自己的
+   `SKILL.md`，把英文 prompt 和项目内输出路径传给它。不要猜测或写死其脚本路径。
+3. 用户明确指定了其他图片生成 skill：遵守用户指定。
+
+如果 Claude Code 找不到 `image-gen`，先检查是否存在
+`~/.claude/skills/image-gen/SKILL.md`。不要因为没有 Codex 内置工具就终止流程。
 
 把原图保存到项目目录，生成带编号的静帧 contact sheet，向用户展示并再次停下。此阶段仍然不调用 Omni Flash，也不生成视频。
 
@@ -223,7 +233,7 @@ gemini-omni-flash-preview
 
 ### Imagegen prompt 模板
 
-使用 Codex 内置 `image_gen` 工具（如有本地 `imagegen` skill 则一并遵守）：
+使用上面选定的图片生成方式：
 
 ```text
 Use case: ads-marketing
