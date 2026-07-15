@@ -24,6 +24,18 @@
       "prompt": "这五条里 1、2、4 的隐喻通过，3 和 5 我还想改。先继续下一步。",
       "expected_output": "Should advance only items 1, 2 and 4 to still generation while keeping items 3 and 5 at the metaphor revision gate. It must not generate video for any item.",
       "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "我在 Claude Code 里已经装好了 image-gen，上一轮隐喻也确认了。继续生成拼贴静帧。",
+      "expected_output": "At Gate 2 in Claude Code, should invoke the installed image-gen skill, follow its own instructions, save the still inside the project, and stop for approval. It must not abort merely because Codex's built-in image_gen is unavailable, hardcode a private helper path, or generate video yet.",
+      "files": [],
+      "expectations": [
+        "Uses the installed image-gen skill for Gate 2 in Claude Code",
+        "Does not require Codex's built-in image_gen when the Claude image skill is available",
+        "Does not hardcode an implementation-specific image helper path",
+        "Stops for still approval before generating video"
+      ]
     }
   ]
 }

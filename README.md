@@ -33,7 +33,7 @@ Turn a ~5s voiceover line into a premium editorial paper-collage assemble-from-e
 
 | 依赖 | 说明 |
 |------|------|
-| Codex 环境 | Gate 2 静帧生成依赖内置 `image_gen` 工具 |
+| 图片生成能力 | Codex 内置 `image_gen`，或 Claude Code 中已安装的图片生成 skill（如 `image-gen`） |
 | `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey) 创建，视频生成按量计费 |
 | Python >= 3.10 | 用于视频生成脚本 |
 | `google-genai >= 2.10.0` | skill 会引导创建共享 venv `~/hyperframes-projects/.omni-venv/` |
@@ -43,11 +43,18 @@ Turn a ~5s voiceover line into a premium editorial paper-collage assemble-from-e
 
 ## 安装
 
-把整个目录放进你的 agent skills 目录（例如 `~/.agents/skills/` 或 `~/.claude/skills/`）：
+把整个目录放进你的 agent skills 目录：
 
 ```bash
+# Codex / 通用 agent skills
 git clone https://github.com/pyang5166/gbro-collage-broll.git ~/.agents/skills/gbro-collage-broll
+
+# Claude Code
+git clone https://github.com/pyang5166/gbro-collage-broll.git ~/.claude/skills/gbro-collage-broll
 ```
+
+Claude Code 会把它注册为 `/gbro-collage-broll`。Gate 2 会优先调用已安装的
+`image-gen` skill；如果你的图片 skill 名称不同，在提示中明确指定即可。
 
 ## 使用
 
